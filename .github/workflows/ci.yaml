@@ -44,8 +44,9 @@ jobs:
     needs: build
     uses: ./.github/workflows/trivy.yaml
     with:
-      image_name: ${{ env.IMAGE_NAME }}
-      image_tag: ${{ env.IMAGE_TAG }}
+      image_tag: ${{ github.sha }}
+    secrets:
+      docker_username: ${{ secrets.DOCKER_USERNAME }}
 
   # 🚀 Push only if scan passes
   push:
