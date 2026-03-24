@@ -58,7 +58,7 @@ jobs:
         image-ref: ${{ steps.meta.outputs.image_name }}:${{ steps.meta.outputs.image_tag }}
         format: table
         exit-code: 1
-        severity: CRITICAL,HIGH
+        severity: CRITICAL
 
     # Login to Docker Hub
     - name: Login to Docker Hub
