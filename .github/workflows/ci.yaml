@@ -40,10 +40,11 @@ jobs:
     # Install dependencies
     - name: Install dependencies
       run: pip install -r requirements.txt
+      if: ${{ hashFiles('requirements.txt') != '' }}
 
     # Run app (basic test)
     - name: Run app
-      run: python app.py
+      run: python3 app.py
 
     # Build Docker image
     - name: Build Docker image
