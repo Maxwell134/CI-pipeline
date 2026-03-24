@@ -8,7 +8,7 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-  build-scan-push:
+  build:
     runs-on: ubuntu-latest
 
     strategy:
@@ -16,6 +16,7 @@ jobs:
         python-version: [3.11]
 
     outputs:
+      image_name: ${{ steps.meta.outputs.image_name }}
       image_tag: ${{ steps.meta.outputs.image_tag }}
 
     steps:
@@ -52,13 +53,13 @@ jobs:
         docker build -t ${{ steps.meta.outputs.image_name }}:${{ steps.meta.outputs.image_tag }} .
 
     # 🔒 Trivy Scan
-    - name: Run Trivy Scan
-      uses: aquasecurity/trivy-action@master
+    - name: scan docker images 
+      needs: build
+      uses: ./.github/workflows/trivy.yml
+      
       with:
-        image-ref: ${{ steps.meta.outputs.image_name }}:${{ steps.meta.outputs.image_tag }}
-        format: table
-        exit-code: 0
-        severity: CRITICAL
+        image_name: ${{ needs.build.image_name }}
+        image_tag: ${{ needs.build.image_tag  }}
 
     # Login to Docker Hub
     - name: Login to Docker Hub
