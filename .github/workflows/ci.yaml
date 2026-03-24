@@ -11,7 +11,7 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/hello-python
   IMAGE_TAG: ${{ github.sha }}
-  ALLOWED_ACTORS: "tridibbasumatary,github-actions[bot]"
+  ALLOWED_ACTORS: "Maxwell134,github-actions[bot]"
 
 jobs:
   build:
