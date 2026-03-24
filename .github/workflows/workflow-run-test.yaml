@@ -1,0 +1,33 @@
+name: Workflow Run Test
+
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types: [completed]
+
+permissions:
+  contents: read
+
+jobs:
+  test-workflow-run:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Print workflow_run context
+        run: |
+          echo "Triggered by workflow: ${{ github.event.workflow_run.name }}"
+          echo "Run ID: ${{ github.event.workflow_run.id }}"
+          echo "Conclusion: ${{ github.event.workflow_run.conclusion }}"
+          echo "Head branch: ${{ github.event.workflow_run.head_branch }}"
+          echo "Head SHA: ${{ github.event.workflow_run.head_sha }}"
+
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Smoke test
+        run: |
+          test -f app.py
+          echo "workflow_run test passed"
+      - name: Docker images 
+        run: docker images 
