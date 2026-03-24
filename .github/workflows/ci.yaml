@@ -43,7 +43,7 @@ jobs:
   # 🔒 Scan job (before push)
   trivy-scan:
     needs: build
-    uses: ./.github/workflows/trivy.yml
+    uses: ./.github/workflows/trivy.yaml
     with:
       image_name: ${{ needs.build.outputs.image_name }}
       image_tag: ${{ needs.build.outputs.image_tag }}
