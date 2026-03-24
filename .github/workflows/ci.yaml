@@ -6,33 +6,32 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/hello-python
+  IMAGE_TAG: ${{ github.sha }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    outputs:
-      image_name: ${{ steps.meta.outputs.image_name }}
-      image_tag: ${{ steps.meta.outputs.image_tag }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      - name: Set image metadata
-        id: meta
+      - name: Validate Docker username secret
         run: |
-          echo "image_name=${{ secrets.DOCKER_USERNAME }}/hello-python" >> $GITHUB_OUTPUT
-          echo "image_tag=${{ github.sha }}" >> $GITHUB_OUTPUT
+          if [ -z "${{ secrets.DOCKER_USERNAME }}" ]; then
+            echo "DOCKER_USERNAME secret is not set."
+            exit 1
+          fi
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ steps.meta.outputs.image_name }}:${{ steps.meta.outputs.image_tag }} .
+          docker build -t ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} .
 
       # ✅ Save image so next job can use it
       - name: Save Docker image
         run: |
-          docker save ${{ steps.meta.outputs.image_name }}:${{ steps.meta.outputs.image_tag }} -o image.tar
+          docker save ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} -o image.tar
 
       - name: Upload image artifact
         uses: actions/upload-artifact@v4
@@ -45,8 +44,8 @@ jobs:
     needs: build
     uses: ./.github/workflows/trivy.yaml
     with:
-      image_name: ${{ needs.build.outputs.image_name }}
-      image_tag: ${{ needs.build.outputs.image_tag }}
+      image_name: ${{ env.IMAGE_NAME }}
+      image_tag: ${{ env.IMAGE_TAG }}
 
   # 🚀 Push only if scan passes
   push:
@@ -70,4 +69,4 @@ jobs:
 
       - name: Push Docker image
         run: |
-          docker push ${{ needs.trivy-scan.inputs.image_name }}:${{ needs.trivy-scan.inputs.image_tag }}
+          docker push ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
