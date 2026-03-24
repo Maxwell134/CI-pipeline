@@ -4,16 +4,39 @@ on:
   push:
     branches: ["main"]
 
+permissions:
+  contents: read
+
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/hello-python
   IMAGE_TAG: ${{ github.sha }}
+  ALLOWED_ACTORS: "tridibbasumatary,github-actions[bot]"
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: write
 
     steps:
+      - name: Validate allowed actor
+        run: |
+          allowed=false
+          IFS=',' read -ra ACTORS <<< "${{ env.ALLOWED_ACTORS }}"
+          for actor in "${ACTORS[@]}"; do
+            if [ "$actor" = "${{ github.actor }}" ]; then
+              allowed=true
+              break
+            fi
+          done
+          if [ "$allowed" != "true" ]; then
+            echo "Actor '${{ github.actor }}' is not allowed to run this workflow."
+            exit 1
+          fi
+
       - name: Checkout code
         uses: actions/checkout@v5
 
@@ -43,6 +66,9 @@ jobs:
   trivy-scan:
     needs: build
     uses: ./.github/workflows/trivy.yaml
+    permissions:
+      contents: read
+      actions: read
     with:
       image_tag: ${{ github.sha }}
     secrets:
@@ -52,6 +78,10 @@ jobs:
   push:
     needs: trivy-scan
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
 
     steps:
       - name: Download image

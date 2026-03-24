@@ -10,9 +10,16 @@ on:
       docker_username:
         required: true
 
+permissions:
+  contents: read
+
 jobs:
   trivy:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read
 
     steps:
       - name: Download image artifact
@@ -24,7 +31,7 @@ jobs:
         run: docker load -i image.tar
 
       - name: Run Trivy Scan
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.28.0
         with:
           image-ref: ${{ secrets.docker_username }}/hello-python:${{ inputs.image_tag }}
           format: table
