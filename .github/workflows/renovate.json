@@ -1,12 +1,15 @@
 {
-    "extends": ["config:base"],
-    "docker": {
-      "enabled": true,
-      "automerge": true,
-      "automergeType": "pr",
-      "platformAutomerge": true
-    },
+    "extends": ["config:recommended"],
+    "automerge": true,
+    "automergeType": "pr",
+    "platformAutomerge": true,
     "packageRules": [
+      {
+        "matchDatasources": ["docker"],
+        "automerge": true,
+        "automergeType": "pr",
+        "platformAutomerge": true
+      },
       {
         "matchDatasources": ["docker"],
         "matchPackageNames": ["python"],
