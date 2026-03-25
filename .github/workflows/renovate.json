@@ -1,0 +1,15 @@
+{
+    "extends": ["config:base"],
+    "docker": {
+      "enabled": true,
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    "packageRules": [
+      {
+        "matchDatasources": ["docker"],
+        "matchPackageNames": ["python"],
+        "groupName": "python updates"
+      }
+    ]
+  }
