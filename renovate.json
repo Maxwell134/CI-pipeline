@@ -1,16 +1,25 @@
 {
-    "extends": ["config:base"],
-    "docker": {
+  "extends": [
+    "config:recommended"
+  ],
+  "packageRules": [
+    {
+      "matchCategories": [
+        "docker"
+      ],
       "enabled": true,
       "automerge": true,
       "automergeType": "pr",
       "platformAutomerge": true
     },
-    "packageRules": [
-      {
-        "matchDatasources": ["docker"],
-        "matchPackageNames": ["python"],
-        "groupName": "python updates"
-      }
-    ]
-  }
+    {
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "python"
+      ],
+      "groupName": "python updates"
+    }
+  ]
+}
